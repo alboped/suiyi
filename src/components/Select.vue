@@ -1,6 +1,8 @@
 <template>
   <div class="select-view">
-    <div class="select-button" @click.stop="tiggleVisible">{{ getOptionLabel(currentOption) }}</div>
+    <div class="select-button" @click.stop="tiggleVisible">
+      {{ getOptionLabel(currentOption) }}
+    </div>
     <div class="select-popup" v-show="popupVisible">
       <div
         class="select-item"

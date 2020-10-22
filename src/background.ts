@@ -19,8 +19,10 @@ function createWindow() {
   win = new BrowserWindow({
     width: 700,
     height: 600,
-    frame: false,
+    frame: true,
+    resizable: true,
     webPreferences: {
+      webSecurity: false,
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: (process.env

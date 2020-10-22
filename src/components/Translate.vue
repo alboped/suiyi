@@ -6,7 +6,7 @@
         autofocus="autofocus"
         v-model="sourceValue"
         @keydown.enter="translateSubmit"
-      ></textarea>
+      />
     </div>
     <div class="tool-bar">
       <Select
@@ -16,6 +16,9 @@
       />
       <Button @onClick="translateSubmit">翻译</Button>
     </div>
+    <div class="result-view">
+      <p v-for="(item, index) in resultList" :key="index">{{ item.dst }}</p>
+    </div>
   </div>
 </template>
 
@@ -24,9 +27,10 @@ import { Options, Vue } from "vue-class-component";
 
 import Select from "./Select.vue";
 import Button from "./Button.vue";
+import { baiduTranslate } from "../translate";
 
 const langOptions = [
-  { id: "1", from: "自动检测" },
+  { id: "1", from: "自动检测语言" },
   { id: "2", from: "中文", to: "英文" },
   { id: "3", from: "英文", to: "中文" }
 ];
@@ -42,13 +46,18 @@ export default class Translate extends Vue {
   langOptions = langOptions;
   selectValue = langOptions[0].id;
   sourceValue = "";
+  resultList = [];
 
   selectChange(item: any) {
     this.selectValue = item.id;
   }
 
-  translateSubmit() {
-    console.log("翻译", this.sourceValue);
+  async translateSubmit() {
+    const { data } = await baiduTranslate(this.sourceValue);
+
+    if (!data.error_code) {
+      this.resultList = data.trans_result;
+    }
   }
 }
 </script>
@@ -74,5 +83,14 @@ export default class Translate extends Vue {
 .tool-bar {
   display: flex;
   justify-content: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgb(202, 202, 202);
+}
+
+.result-view {
+  padding: 20px;
+  p {
+    margin: 0 0 10px 0;
+  }
 }
 </style>

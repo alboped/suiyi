@@ -55,7 +55,9 @@ export default class Translate extends Vue {
   async translateSubmit() {
     const { data } = await baiduTranslate(this.sourceValue);
 
-    if (!data.error_code) {
+    if (data.error_code) {
+      this.resultList = [];
+    } else {
       this.resultList = data.trans_result;
     }
   }

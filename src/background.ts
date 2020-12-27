@@ -2,7 +2,7 @@
 
 declare const __static: string;
 
-import { app, protocol, BrowserWindow, Tray } from "electron";
+import { app, protocol, BrowserWindow, Tray, nativeImage, ipcMain, nativeTheme } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import path from "path";
@@ -17,6 +17,14 @@ let tray: Tray | null;
 protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } }
 ]);
+
+function getTrayIcon(fileName) {
+  const image = nativeImage.createFromPath(path.join(__static, fileName));
+  return image.resize({
+    width: 22,
+    height: 22
+  });
+}
 
 function createWindow() {
   // Create the browser window.
@@ -37,6 +45,8 @@ function createWindow() {
     }
   });
 
+  console.log(path.join(__static, "icon.png"));
+
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
@@ -51,11 +61,25 @@ function createWindow() {
     win = null;
   });
 
-  tray = new Tray(path.join(__static, "icon.png"));
+  const iconDark = getTrayIcon('tray_dark.png');
+  const iconLight = getTrayIcon('tray_light.png');
+
+  tray = new Tray(iconDark);
   tray.setToolTip("随译");
 
   tray.on("click", () => {
     console.log("点击托盘了---");
+  });
+
+  ipcMain.handle("dark-mode:toggle", () => {
+    if (nativeTheme.shouldUseDarkColors) {
+      nativeTheme.themeSource = "light";
+      tray.setImage(iconLight);
+    } else {
+      tray.setImage(iconDark);
+      nativeTheme.themeSource = "dark";
+    }
+    return nativeTheme.shouldUseDarkColors;
   });
 }
 
